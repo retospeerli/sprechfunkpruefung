@@ -34,17 +34,18 @@
 
         <button id="startBtn" class="main-btn">Prüfung starten</button>
 
-        <div class="ptt-area">
-          <button id="pttBtn" class="ptt-btn" disabled>PTT halten</button>
-          <p>Taste: <strong id="keyLabel">Leertaste</strong></p>
-          <button id="changeKeyBtn" class="small-btn">Taste ändern</button>
+        <div class="key-hint">
+          PTT-Taste: <strong id="keyLabel">Leertaste</strong>
+          <button id="changeKeyBtn" class="small-btn">ändern</button>
         </div>
+
+        <button id="pttBtn" class="hidden-ptt" disabled aria-label="PTT"></button>
 
         <div id="recordStatus" class="status">Noch keine Aufnahme.</div>
 
         <div id="manualFallback" class="manual hidden">
           <label for="manualText">Notfall-Eingabe:</label>
-          <textarea id="manualText" rows="3"></textarea>
+          <textarea id="manualText" rows="2"></textarea>
           <button id="saveManualBtn" class="small-btn">Antwort speichern</button>
         </div>
       </section>
