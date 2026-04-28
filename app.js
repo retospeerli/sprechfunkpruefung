@@ -17,35 +17,240 @@ const ASSETS = {
   passwordAudio: "audio/passwort4.mp3"
 };
 
-const TASKS = [
+const SCENES = [
   {
-    id: 1,
-    title: "Aufgabe 1: Treffpunkt vereinbaren",
-    scene: "img/scene1.png",
-    pc: "Anna von Bruno, wo und wann treffen wir uns? antworten",
-    required: {
-      start: ["verstanden"],
-      end: ["antworten"],
-      contentAny: ["treffpunkt", "bruecke", "brücke", "baum", "felsen", "fluss", "scheune", "eiche", "feuerstelle", "kreuzung"],
-      timeAny: ["uhr", "eins", "zwei", "drei", "vier", "fuenf", "fünf", "sechs", "sieben", "acht", "neun", "zehn", "elf", "zwoelf", "zwölf"]
-    }
+    title: "Szene 1: Treffpunkt vereinbaren",
+    image: "img/scene1.png",
+    card: `
+      <strong>Anruf durch Anna</strong>
+      <ul>
+        <li>Bruno anrufen</li>
+        <li>Treffpunkt erfragen</li>
+        <li>Störung korrekt behandeln</li>
+        <li>Treffpunkt: knorrige Eiche</li>
+        <li>Zeit: 2 Uhr geht nicht, Unterricht</li>
+        <li>Vorschlag: 4 Uhr</li>
+        <li>Gespräch korrekt beenden</li>
+      </ul>
+    `
   },
   {
-    id: 2,
-    title: "Aufgabe 2: Beobachtung beschreiben",
-    scene: "img/scene2.png",
-    pc: "Was siehst du? antworten",
-    required: {
-      start: ["verstanden"],
-      end: ["antworten"],
-      contentAny: ["ich sehe", "auto", "person", "scheune", "haus", "baum", "objekt", "rot", "blau", "nummer", "kennzeichen", "neben", "vor", "hinter"],
-      minWords: 7
-    }
+    title: "Szene 2: Beobachtung mit Fernglas",
+    image: "img/scene2.png",
+    card: `
+      <strong>Anruf durch Bruno</strong>
+      <ul>
+        <li>Position bestätigen</li>
+        <li>Bus: nicht blau, sondern rot</li>
+        <li>Bei der alten Scheune: drei Personen</li>
+        <li>Feuer gemacht</li>
+        <li>stehen darum herum</li>
+        <li>weiter beobachten</li>
+        <li>Gespräch korrekt beenden</li>
+      </ul>
+    `
+  }
+];
+
+const STEPS = [
+  {
+    scene: 0,
+    speaker: "user",
+    prompt: "Beginne den Anruf.",
+    label: "Anna ruft Bruno",
+    checks: [
+      { label: "Bruno von Anna", any: ["bruno von anna"] },
+      { label: "antworten am Schluss", end: ["antworten"] }
+    ]
+  },
+  {
+    scene: 0,
+    speaker: "pc",
+    text: "Anna von Bruno, verstanden, antworten"
+  },
+  {
+    scene: 0,
+    speaker: "user",
+    prompt: "Frage nach dem Treffpunkt.",
+    label: "Treffpunkt erfragen",
+    checks: [
+      { label: "verstanden zuerst", start: ["verstanden"] },
+      { label: "Treffpunkt-Frage", allAny: [["wo", "treffpunkt", "treffen"]] },
+      { label: "antworten am Schluss", end: ["antworten"] }
+    ]
+  },
+  {
+    scene: 0,
+    speaker: "pc",
+    text: "Krrr ... bei der knorrigen Eiche ... krrr ... antworten ...",
+    distorted: true
+  },
+  {
+    scene: 0,
+    speaker: "user",
+    prompt: "Du hast Bruno nicht verstanden.",
+    label: "Wiederholung verlangen",
+    checks: [
+      { label: "nicht verstanden", any: ["nicht verstanden"] },
+      { label: "wiederholen", any: ["wiederholen"] }
+    ]
+  },
+  {
+    scene: 0,
+    speaker: "pc",
+    text: "Ich wiederhole, Treffpunkt bei der knorrigen Eiche, antworten"
+  },
+  {
+    scene: 0,
+    speaker: "user",
+    prompt: "Bestätige den Treffpunkt.",
+    label: "Treffpunkt bestätigen",
+    checks: [
+      { label: "verstanden zuerst", start: ["verstanden"] },
+      { label: "Treffpunkt", any: ["treffpunkt", "treffen"] },
+      { label: "knorrige Eiche", allAny: [["knorrige", "knorrigen"], ["eiche", "baum"]] },
+      { label: "antworten am Schluss", end: ["antworten"] }
+    ]
+  },
+  {
+    scene: 0,
+    speaker: "user",
+    prompt: "Frage nach der Zeit.",
+    label: "Zeit erfragen",
+    checks: [
+      { label: "verstanden zuerst", start: ["verstanden"] },
+      { label: "Zeitfrage", allAny: [["wann", "uhr", "zeit"]] },
+      { label: "antworten am Schluss", end: ["antworten"] }
+    ]
+  },
+  {
+    scene: 0,
+    speaker: "pc",
+    text: "Verstanden, wir treffen uns um zwei Uhr nachmittags, antworten"
+  },
+  {
+    scene: 0,
+    speaker: "user",
+    prompt: "Zwei Uhr geht nicht. Mache einen neuen Vorschlag.",
+    label: "Vier Uhr vorschlagen",
+    checks: [
+      { label: "verstanden zuerst", start: ["verstanden"] },
+      { label: "zwei Uhr geht nicht", allAny: [["zwei", "2"], ["geht nicht", "nicht"]] },
+      { label: "Unterricht", any: ["unterricht", "schule"] },
+      { label: "Vorschlag vier Uhr", allAny: [["vorschlag", "schlage"], ["vier", "4"]] },
+      { label: "antworten am Schluss", end: ["antworten"] }
+    ]
+  },
+  {
+    scene: 0,
+    speaker: "pc",
+    text: "Verstanden, Treffpunkt bei der knorrigen Eiche um vier Uhr, Schluss"
+  },
+  {
+    scene: 0,
+    speaker: "user",
+    prompt: "Beende das Gespräch.",
+    label: "Gespräch beenden",
+    checks: [
+      { label: "verstanden zuerst", start: ["verstanden"] },
+      { label: "Ende oder Schluss", any: ["ende", "schluss"] }
+    ]
+  },
+
+  {
+    scene: 1,
+    speaker: "pc",
+    text: "Anna von Bruno, bist du in Position, antworten"
+  },
+  {
+    scene: 1,
+    speaker: "user",
+    prompt: "Bestätige deine Position.",
+    label: "Position bestätigen",
+    checks: [
+      { label: "verstanden zuerst", start: ["verstanden"] },
+      { label: "in Position", any: ["in position", "bin bereit", "bereit"] },
+      { label: "antworten am Schluss", end: ["antworten"] }
+    ]
+  },
+  {
+    scene: 1,
+    speaker: "pc",
+    text: "Verstanden, siehst du den blauen Bus, antworten"
+  },
+  {
+    scene: 1,
+    speaker: "user",
+    prompt: "Korrigiere die Beobachtung zum Bus.",
+    label: "Busfarbe korrigieren",
+    checks: [
+      { label: "verstanden zuerst", start: ["verstanden"] },
+      { label: "negativ / nein", any: ["negativ", "nein", "nicht"] },
+      { label: "Bus/Fahrzeug/Auto", any: ["bus", "fahrzeug", "auto"] },
+      { label: "rot", any: ["rot", "roter", "rotes", "rotten", "rottes"] },
+      { label: "antworten am Schluss", end: ["antworten"] }
+    ]
+  },
+  {
+    scene: 1,
+    speaker: "pc",
+    text: "Verstanden, wie viele Personen sind bei der alten Scheune, antworten"
+  },
+  {
+    scene: 1,
+    speaker: "user",
+    prompt: "Melde die Anzahl Personen bei der Scheune.",
+    label: "Drei Personen melden",
+    checks: [
+      { label: "verstanden zuerst", start: ["verstanden"] },
+      { label: "drei", any: ["drei", "3"] },
+      { label: "Personen/Menschen/Leute", any: ["personen", "menschen", "leute", "männer", "maenner", "kinder"] },
+      { label: "alte Scheune", allAny: [["scheune", "stall"], ["alt", "alte", "alten"]] },
+      { label: "antworten am Schluss", end: ["antworten"] }
+    ]
+  },
+  {
+    scene: 1,
+    speaker: "pc",
+    text: "Verstanden, was tun sie, antworten"
+  },
+  {
+    scene: 1,
+    speaker: "user",
+    prompt: "Beschreibe, was die Personen tun.",
+    label: "Feuer beschreiben",
+    checks: [
+      { label: "verstanden zuerst", start: ["verstanden"] },
+      { label: "Feuer", any: ["feuer", "feuerstelle"] },
+      { label: "stehen herum", allAny: [["stehen", "sitzen", "sind"], ["darum", "herum", "drumherum", "rundherum"]] },
+      { label: "antworten am Schluss", end: ["antworten"] }
+    ]
+  },
+  {
+    scene: 1,
+    speaker: "pc",
+    text: "Verstanden, Auftrag, weiter beobachten, antworten"
+  },
+  {
+    scene: 1,
+    speaker: "user",
+    prompt: "Bestätige den Auftrag und beende.",
+    label: "Auftrag bestätigen und beenden",
+    checks: [
+      { label: "verstanden zuerst", start: ["verstanden"] },
+      { label: "weiter beobachten", allAny: [["beobachte", "beobachten"], ["weiter"]] },
+      { label: "Ende", end: ["ende", "schluss"] }
+    ]
+  },
+  {
+    scene: 1,
+    speaker: "pc",
+    text: "Ende"
   }
 ];
 
 const state = {
-  currentTask: -1,
+  stepIndex: -1,
   answers: [],
   pttKey: "Space",
   waitingForCustomKey: false,
@@ -60,6 +265,7 @@ const state = {
 
 const el = {
   taskTitle: document.getElementById("taskTitle"),
+  taskCard: document.getElementById("taskCard"),
   sceneImage: document.getElementById("sceneImage"),
   radioImage: document.getElementById("radioImage"),
   pcText: document.getElementById("pcText"),
@@ -83,7 +289,7 @@ for (const [key, src] of Object.entries(ASSETS.sfx)) {
   audio[key] = new Audio(src);
 }
 audio.staticLow.loop = true;
-audio.staticLow.volume = 0.28;
+audio.staticLow.volume = 0.35;
 
 const passwordAudio = new Audio(ASSETS.passwordAudio);
 
@@ -114,32 +320,57 @@ function initSpeechRecognition() {
   state.recognition.onerror = () => {
     el.manualFallback.classList.remove("hidden");
   };
-
-  state.recognition.onend = () => {
-    if (state.isPressed && state.canSpeak) {
-      try {
-        state.recognition.start();
-      } catch (e) {}
-    }
-  };
 }
 
-function playSfx(name) {
-  const snd = audio[name];
-  if (!snd) return;
-  try {
-    snd.currentTime = 0;
-    snd.play().catch(() => {});
-  } catch (e) {}
+function startExam() {
+  state.stepIndex = -1;
+  state.answers = [];
+  state.examRunning = true;
+  state.currentTranscript = "";
+  el.startBtn.disabled = true;
+  el.pttBtn.disabled = true;
+  el.resultOverlay.classList.add("hidden");
+  nextStep();
 }
 
-function setRadio(mode) {
-  el.radioImage.src = ASSETS.radio[mode] || ASSETS.radio.standby;
+function nextStep() {
+  state.stepIndex++;
+
+  if (state.stepIndex >= STEPS.length) {
+    finishExam();
+    return;
+  }
+
+  const step = STEPS[state.stepIndex];
+  const scene = SCENES[step.scene];
+
+  el.taskTitle.textContent = scene.title;
+  el.sceneImage.src = scene.image;
+  el.taskCard.innerHTML = scene.card;
+  state.currentTranscript = "";
+  el.manualText.value = "";
+
+  if (step.speaker === "pc") {
+    el.pttBtn.disabled = true;
+    speakPc(step.text, step.distorted, () => {
+      nextStep();
+    });
+  } else {
+    el.pttBtn.disabled = false;
+    el.pcText.textContent = step.prompt;
+    el.recordStatus.textContent = "PTT halten, 1 Sekunde warten, dann sprechen.";
+  }
 }
 
-function speakPc(text, after = null) {
+function speakPc(text, distorted, after) {
   setRadio("receive");
   el.pcText.textContent = text;
+
+  if (distorted) {
+    audio.staticLow.volume = 0.75;
+  } else {
+    audio.staticLow.volume = 0.24;
+  }
 
   try {
     audio.staticLow.currentTime = 0;
@@ -148,13 +379,12 @@ function speakPc(text, after = null) {
 
   if ("speechSynthesis" in window) {
     window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "de-CH";
-    utterance.rate = 0.92;
-    utterance.onend = () => {
-      stopReceive(after);
-    };
-    window.speechSynthesis.speak(utterance);
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "de-CH";
+    u.rate = 0.92;
+    u.volume = distorted ? 0.35 : 1;
+    u.onend = () => stopReceive(after);
+    window.speechSynthesis.speak(u);
   } else {
     setTimeout(() => stopReceive(after), 2500);
   }
@@ -167,39 +397,9 @@ function stopReceive(after) {
   } catch (e) {}
 
   setRadio("standby");
-  if (typeof after === "function") after();
-}
-
-function startExam() {
-  state.currentTask = -1;
-  state.answers = [];
-  state.examRunning = true;
-  el.startBtn.disabled = true;
-  el.pttBtn.disabled = false;
-  el.resultOverlay.classList.add("hidden");
-  nextTask();
-}
-
-function nextTask() {
-  state.currentTask++;
-
-  if (state.currentTask >= TASKS.length) {
-    finishExam();
-    return;
+  if (typeof after === "function") {
+    setTimeout(after, 500);
   }
-
-  const task = TASKS[state.currentTask];
-  el.taskTitle.textContent = task.title;
-  el.sceneImage.src = task.scene;
-  el.recordStatus.textContent = "Höre gut zu. Danach PTT halten, 1 Sekunde warten, dann sprechen.";
-  el.manualText.value = "";
-  state.currentTranscript = "";
-
-  el.pttBtn.disabled = true;
-  speakPc(task.pc, () => {
-    el.pttBtn.disabled = false;
-    el.recordStatus.textContent = "Jetzt antworten: PTT gedrückt halten.";
-  });
 }
 
 function startPtt() {
@@ -215,14 +415,11 @@ function startPtt() {
 
   state.pressTimer = setTimeout(() => {
     if (!state.isPressed) return;
-
     state.canSpeak = true;
     playSfx("buzz");
     el.recordStatus.textContent = "Sprechen.";
     if (state.recognitionAvailable && state.recognition) {
-      try {
-        state.recognition.start();
-      } catch (e) {}
+      try { state.recognition.start(); } catch (e) {}
     }
   }, 1000);
 }
@@ -238,24 +435,40 @@ function stopPtt() {
   playSfx("pttUp");
 
   if (state.recognition) {
-    try {
-      state.recognition.stop();
-    } catch (e) {}
+    try { state.recognition.stop(); } catch (e) {}
   }
 
-  const answer = state.currentTranscript.trim();
-  state.answers[state.currentTask] = answer;
-  el.recordStatus.textContent = "Antwort gespeichert. Keine Auswertung während der Prüfung.";
+  const step = STEPS[state.stepIndex];
+  state.answers.push({
+    stepIndex: state.stepIndex,
+    label: step.label,
+    expectedPrompt: step.prompt,
+    text: state.currentTranscript.trim()
+  });
 
-  setTimeout(() => {
-    nextTask();
-  }, 900);
+  el.recordStatus.textContent = "Antwort gespeichert. Keine Auswertung während der Prüfung.";
+  el.pttBtn.disabled = true;
+
+  setTimeout(nextStep, 900);
 }
 
 function saveManualAnswer() {
-  if (!state.examRunning || state.currentTask < 0) return;
-  state.answers[state.currentTask] = el.manualText.value.trim();
-  el.recordStatus.textContent = "Manuelle Antwort gespeichert.";
+  if (!state.examRunning) return;
+  state.currentTranscript = el.manualText.value.trim();
+  stopPtt();
+}
+
+function setRadio(mode) {
+  el.radioImage.src = ASSETS.radio[mode] || ASSETS.radio.standby;
+}
+
+function playSfx(name) {
+  const snd = audio[name];
+  if (!snd) return;
+  try {
+    snd.currentTime = 0;
+    snd.play().catch(() => {});
+  } catch (e) {}
 }
 
 function normalize(text) {
@@ -270,69 +483,44 @@ function normalize(text) {
     .trim();
 }
 
-function containsAny(normalized, words) {
-  return words.some(word => normalized.includes(normalize(word)));
+function hasAny(n, arr) {
+  return arr.some(x => n.includes(normalize(x)));
 }
 
-function startsWithAny(normalized, words) {
-  return words.some(word => normalized.startsWith(normalize(word)));
+function startsAny(n, arr) {
+  return arr.some(x => n.startsWith(normalize(x)));
 }
 
-function endsWithAny(normalized, words) {
-  return words.some(word => normalized.endsWith(normalize(word)));
+function endsAny(n, arr) {
+  return arr.some(x => n.endsWith(normalize(x)));
 }
 
-function wordCount(normalized) {
-  if (!normalized) return 0;
-  return normalized.split(" ").filter(Boolean).length;
+function checkRule(n, rule) {
+  if (rule.any) return hasAny(n, rule.any);
+  if (rule.start) return startsAny(n, rule.start);
+  if (rule.end) return endsAny(n, rule.end);
+  if (rule.allAny) return rule.allAny.every(group => hasAny(n, group));
+  return false;
 }
 
-function evaluateTask(task, answer) {
-  const n = normalize(answer);
-  const checks = [];
+function evaluateAnswer(answer) {
+  const step = STEPS[answer.stepIndex];
+  const n = normalize(answer.text);
 
-  const startOk = startsWithAny(n, task.required.start);
-  checks.push({
-    label: "beginnt mit „verstanden“",
-    ok: startOk
-  });
+  const checks = step.checks.map(rule => ({
+    label: rule.label,
+    ok: checkRule(n, rule)
+  }));
 
-  const endOk = endsWithAny(n, task.required.end);
-  checks.push({
-    label: "endet mit „antworten“",
-    ok: endOk
-  });
+  const okCount = checks.filter(c => c.ok).length;
+  const passed = okCount === checks.length;
 
-  const contentOk = containsAny(n, task.required.contentAny);
-  checks.push({
-    label: "Inhalt passt zur Aufgabe",
-    ok: contentOk
-  });
-
-  if (task.required.timeAny) {
-    checks.push({
-      label: "Zeitangabe vorhanden",
-      ok: containsAny(n, task.required.timeAny)
-    });
-  }
-
-  if (task.required.minWords) {
-    checks.push({
-      label: "Beobachtung ausreichend beschrieben",
-      ok: wordCount(n) >= task.required.minWords
-    });
-  }
-
-  const forbiddenFinish = n.includes("schluss") || n.includes("ende");
-  checks.push({
-    label: "kein falscher Gesprächsabschluss",
-    ok: !forbiddenFinish
-  });
-
-  const score = checks.filter(c => c.ok).length;
-  const passed = score >= checks.length - 1 && startOk && endOk && contentOk;
-
-  return { task, answer, normalized: n, checks, passed };
+  return {
+    label: answer.label,
+    text: answer.text,
+    checks,
+    passed
+  };
 }
 
 function finishExam() {
@@ -340,24 +528,22 @@ function finishExam() {
   el.pttBtn.disabled = true;
   setRadio("standby");
 
-  const results = TASKS.map((task, i) => evaluateTask(task, state.answers[i] || ""));
+  const results = state.answers.map(evaluateAnswer);
   const passed = results.every(r => r.passed);
 
   el.resultTitle.textContent = passed ? "Prüfung bestanden" : "Prüfung noch nicht bestanden";
 
   let html = "";
 
-  results.forEach((result, index) => {
-    html += `<div class="result-task">`;
-    html += `<h3>${TASKS[index].title}</h3>`;
-    html += `<p><strong>Erkannte Antwort:</strong></p>`;
-    html += `<div class="transcript">${escapeHtml(result.answer || "Keine Antwort erkannt.")}</div>`;
-    html += `<p><strong>Auswertung:</strong></p>`;
-
-    result.checks.forEach(check => {
-      html += `<span class="term ${check.ok ? "ok" : "bad"}">${escapeHtml(check.label)}</span>`;
+  results.forEach((r, i) => {
+    html += `<div class="result-step">`;
+    html += `<h3>${i + 1}. ${escapeHtml(r.label)}</h3>`;
+    html += `<div class="transcript">${escapeHtml(r.text || "Keine Antwort erkannt.")}</div>`;
+    html += `<p>`;
+    r.checks.forEach(c => {
+      html += `<span class="term ${c.ok ? "ok" : "bad"}">${escapeHtml(c.label)}</span>`;
     });
-
+    html += `</p>`;
     html += `</div>`;
   });
 
@@ -367,7 +553,7 @@ function finishExam() {
     playPasswordAudio();
     sendLearningViewSolved();
   } else {
-    html += `<p class="term bad">Noch nicht bestanden. Achte besonders auf „verstanden“ am Anfang, die passende Information und „antworten“ am Schluss.</p>`;
+    html += `<p class="term bad">Noch nicht bestanden. Wiederhole die Prüfung und achte auf Reihenfolge, Funkbegriffe und Inhalte.</p>`;
     playSfx("error");
   }
 
@@ -431,10 +617,12 @@ document.addEventListener("keyup", (e) => {
 el.pttBtn.addEventListener("mousedown", startPtt);
 el.pttBtn.addEventListener("mouseup", stopPtt);
 el.pttBtn.addEventListener("mouseleave", stopPtt);
+
 el.pttBtn.addEventListener("touchstart", (e) => {
   e.preventDefault();
   startPtt();
 }, { passive: false });
+
 el.pttBtn.addEventListener("touchend", (e) => {
   e.preventDefault();
   stopPtt();
