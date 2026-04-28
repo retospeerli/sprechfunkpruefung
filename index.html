@@ -11,7 +11,7 @@
     <section class="scene-panel">
       <div class="scene-header">
         <h1>Funkerschule Prüfung</h1>
-        <p id="taskTitle">Bereit für Aufgabe 1</p>
+        <p id="taskTitle">Bereit</p>
       </div>
 
       <div class="scene-box">
@@ -19,27 +19,32 @@
       </div>
     </section>
 
-    <aside class="radio-panel">
+    <aside class="side-panel">
       <section class="radio-box">
         <img id="radioImage" src="img/standby.png" alt="Funkgerät">
       </section>
 
+      <section class="card-box">
+        <h2>Auftragskarte</h2>
+        <div id="taskCard">Drücke „Prüfung starten“.</div>
+      </section>
+
       <section class="control-box">
-        <div id="pcText" class="pc-text">Drücke „Prüfung starten“.</div>
+        <div id="pcText" class="pc-text">Bereit.</div>
 
         <button id="startBtn" class="main-btn">Prüfung starten</button>
 
         <div class="ptt-area">
           <button id="pttBtn" class="ptt-btn" disabled>PTT halten</button>
-          <p class="hint">Taste halten: <strong id="keyLabel">Leertaste</strong></p>
+          <p>Taste: <strong id="keyLabel">Leertaste</strong></p>
           <button id="changeKeyBtn" class="small-btn">Taste ändern</button>
         </div>
 
         <div id="recordStatus" class="status">Noch keine Aufnahme.</div>
 
         <div id="manualFallback" class="manual hidden">
-          <label for="manualText">Notfall-Eingabe, falls Spracherkennung nicht funktioniert:</label>
-          <textarea id="manualText" rows="4"></textarea>
+          <label for="manualText">Notfall-Eingabe:</label>
+          <textarea id="manualText" rows="3"></textarea>
           <button id="saveManualBtn" class="small-btn">Antwort speichern</button>
         </div>
       </section>
@@ -50,10 +55,8 @@
     <div class="result-card">
       <h2 id="resultTitle">Auswertung</h2>
       <div id="resultContent"></div>
-      <div class="result-actions">
-        <button id="retryBtn" class="main-btn">Prüfung wiederholen</button>
-        <button id="closeBtn" class="small-btn">Schliessen</button>
-      </div>
+      <button id="retryBtn" class="main-btn">Prüfung wiederholen</button>
+      <button id="closeBtn" class="small-btn">Schliessen</button>
     </div>
   </section>
 
