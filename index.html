@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Funkerschule Prüfung</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <section class="scene-panel">
+      <div class="scene-header">
+        <h1>Funkerschule Prüfung</h1>
+        <p id="taskTitle">Bereit für Aufgabe 1</p>
+      </div>
+
+      <div class="scene-box">
+        <img id="sceneImage" src="img/scene1.png" alt="Prüfungsszene">
+      </div>
+    </section>
+
+    <aside class="radio-panel">
+      <section class="radio-box">
+        <img id="radioImage" src="img/standby.png" alt="Funkgerät">
+      </section>
+
+      <section class="control-box">
+        <div id="pcText" class="pc-text">Drücke „Prüfung starten“.</div>
+
+        <button id="startBtn" class="main-btn">Prüfung starten</button>
+
+        <div class="ptt-area">
+          <button id="pttBtn" class="ptt-btn" disabled>PTT halten</button>
+          <p class="hint">Taste halten: <strong id="keyLabel">Leertaste</strong></p>
+          <button id="changeKeyBtn" class="small-btn">Taste ändern</button>
+        </div>
+
+        <div id="recordStatus" class="status">Noch keine Aufnahme.</div>
+
+        <div id="manualFallback" class="manual hidden">
+          <label for="manualText">Notfall-Eingabe, falls Spracherkennung nicht funktioniert:</label>
+          <textarea id="manualText" rows="4"></textarea>
+          <button id="saveManualBtn" class="small-btn">Antwort speichern</button>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <section id="resultOverlay" class="overlay hidden">
+    <div class="result-card">
+      <h2 id="resultTitle">Auswertung</h2>
+      <div id="resultContent"></div>
+      <div class="result-actions">
+        <button id="retryBtn" class="main-btn">Prüfung wiederholen</button>
+        <button id="closeBtn" class="small-btn">Schliessen</button>
+      </div>
+    </div>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
