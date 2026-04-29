@@ -2,12 +2,27 @@
 <html lang="de">
 <head>
   <meta charset="utf-8">
+
+  <!-- =========================================
+       MOBILE / RESPONSIVE BASIS
+       ========================================= -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <title>Funkerschule Prüfung</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+  <!-- =========================================
+       HAUPTLAYOUT
+       Links: Szene
+       Rechts: Funkgerät, Auftragskarte, Steuerung
+       ========================================= -->
   <main class="app">
+
+    <!-- =========================================
+         LINKE SEITE: BILD / SZENE
+         ========================================= -->
     <section class="scene-panel">
       <div class="scene-header">
         <h1>Funkerschule Prüfung</h1>
@@ -19,30 +34,39 @@
       </div>
     </section>
 
+    <!-- =========================================
+         RECHTE SEITE: FUNKGERÄT + AUFTRAG + STATUS
+         ========================================= -->
     <aside class="side-panel">
+
+      <!-- Funkgerät bleibt fix gross und schrumpft nicht -->
       <section class="radio-box">
         <img id="radioImage" src="img/standby.png" alt="Funkgerät">
       </section>
 
+      <!-- Auftragskarte: nur Stichwörter, keine ablesbaren Funksprüche -->
       <section class="card-box">
         <h2>Auftragskarte</h2>
         <div id="taskCard">Drücke „Prüfung starten“.</div>
       </section>
 
+      <!-- Steuerbereich: keine sichtbare PTT-Taste, nur Tastaturhinweis -->
       <section class="control-box">
         <div id="pcText" class="pc-text">Bereit.</div>
 
         <button id="startBtn" class="main-btn">Prüfung starten</button>
 
         <div class="key-hint">
-          PTT-Taste: <strong id="keyLabel">Leertaste</strong>
+          <span>PTT-Taste: <strong id="keyLabel">Leertaste</strong></span>
           <button id="changeKeyBtn" class="small-btn">ändern</button>
         </div>
 
+        <!-- Unsichtbarer Button bleibt nur aus Kompatibilitätsgründen im DOM -->
         <button id="pttBtn" class="hidden-ptt" disabled aria-label="PTT"></button>
 
         <div id="recordStatus" class="status">Noch keine Aufnahme.</div>
 
+        <!-- Notfall-Eingabe bei fehlender/fehlerhafter Spracherkennung -->
         <div id="manualFallback" class="manual hidden">
           <label for="manualText">Notfall-Eingabe:</label>
           <textarea id="manualText" rows="2"></textarea>
@@ -52,12 +76,19 @@
     </aside>
   </main>
 
+  <!-- =========================================
+       AUSWERTUNG
+       Wird erst ganz am Schluss angezeigt
+       ========================================= -->
   <section id="resultOverlay" class="overlay hidden">
     <div class="result-card">
       <h2 id="resultTitle">Auswertung</h2>
       <div id="resultContent"></div>
-      <button id="retryBtn" class="main-btn">Prüfung wiederholen</button>
-      <button id="closeBtn" class="small-btn">Schliessen</button>
+
+      <div class="result-actions">
+        <button id="retryBtn" class="main-btn">Prüfung wiederholen</button>
+        <button id="closeBtn" class="small-btn">Schliessen</button>
+      </div>
     </div>
   </section>
 
