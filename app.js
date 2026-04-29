@@ -376,7 +376,36 @@ function finishExam() {
   el.startBtn.disabled = false;
 
   const results = state.answers.map(evaluateAnswer);
-  const passed = results.length > 0 && results.every(r => r.passed);
+
+  let funkErrors = 0;
+  let contentErrors = 0;
+
+  results.forEach(function (r) {
+    r.checks.forEach(function (c) {
+      if (c.ok) return;
+
+      const label = c.label.toLowerCase();
+
+      if (
+        label.includes("verstanden") ||
+        label.includes("antworten") ||
+        label.includes("ende") ||
+        label.includes("schluss") ||
+        label.includes("bruno von anna") ||
+        label.includes("nicht verstanden") ||
+        label.includes("wiederholen")
+      ) {
+        funkErrors++;
+      } else {
+        contentErrors++;
+      }
+    });
+  });
+
+  const passed =
+    results.length > 0 &&
+    funkErrors <= 2 &&
+    contentErrors <= 3;
 
   el.resultTitle.textContent = passed ? "Prüfung bestanden" : "Prüfung noch nicht bestanden";
 
@@ -394,6 +423,27 @@ function finishExam() {
     html += `</div>`;
   });
 
+  html += `
+    <div class="result-step">
+      <h3>Gesamtergebnis</h3>
+      <p><strong>Funkdisziplin-Fehler:</strong> ${funkErrors} / maximal 2</p>
+      <p><strong>Inhaltliche Fehler:</strong> ${contentErrors} / maximal 3</p>
+    </div>
+  `;
+
+  if (passed) {
+    html += `<p class="term ok">Bestanden. Notiere das Passwort.</p>`;
+    playSfx("success");
+    playPasswordAudio();
+    sendLearningViewSolved();
+  } else {
+    html += `<p class="term bad">Noch nicht bestanden. Wiederhole die Prüfung und achte auf Funkbegriffe, Reihenfolge und die wichtigsten Inhalte.</p>`;
+    playSfx("error");
+  }
+
+  el.resultContent.innerHTML = html;
+  el.resultOverlay.classList.remove("hidden");
+}
   if (passed) {
     html += `<p class="term ok">Bestanden. Notiere das Passwort.</p>`;
     playSfx("success");
