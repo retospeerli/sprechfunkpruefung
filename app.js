@@ -53,83 +53,189 @@ const SCENES = [
 ];
 
 const STEPS = [
-  { scene: 0, speaker: "user", prompt: "Beginne den Anruf.", label: "Anna ruft Bruno", checks: [
-    { label: "Bruno von Anna", any: ["bruno von anna"] },
-    { label: "antworten am Schluss", end: ["antworten"] }
-  ]},
-  { scene: 0, speaker: "pc", text: "Anna von Bruno, verstanden, antworten" },
-  { scene: 0, speaker: "user", prompt: "Frage nach dem Treffpunkt.", label: "Treffpunkt erfragen", checks: [
-    { label: "verstanden zuerst", start: ["verstanden"] },
-    { label: "Treffpunkt-Frage", any: ["wo treffen", "wo ist", "treffpunkt", "wo sollen wir uns treffen"] },
-    { label: "antworten am Schluss", end: ["antworten"] }
-  ]},
-  { scene: 0, speaker: "pc", text: "Krrr ... bei der knorrigen Eiche ... krrr ... antworten ...", distorted: true },
-  { scene: 0, speaker: "user", prompt: "Du hast Bruno nicht verstanden.", label: "Wiederholung verlangen", checks: [
-    { label: "nicht verstanden", any: ["nicht verstanden"] },
-    { label: "wiederholen", any: ["wiederholen"] }
-  ]},
-  { scene: 0, speaker: "pc", text: "Ich wiederhole, Treffpunkt bei der knorrigen Eiche, antworten" },
-  { scene: 0, speaker: "user", prompt: "Bestätige den Treffpunkt.", label: "Treffpunkt bestätigen", checks: [
-    { label: "verstanden zuerst", start: ["verstanden"] },
-    { label: "Treffpunkt", any: ["treffpunkt", "treffen"] },
-    { label: "knorrige Eiche", allAny: [["knorrige", "knorrigen"], ["eiche", "baum"]] },
-    { label: "antworten am Schluss", end: ["antworten"] }
-  ]},
-  { scene: 0, speaker: "user", prompt: "Frage nach der Zeit.", label: "Zeit erfragen", checks: [
-    { label: "verstanden zuerst", start: ["verstanden"] },
-    { label: "Zeitfrage", any: ["wann", "welche zeit", "um wie viel", "um wieviel", "uhr"] },
-    { label: "antworten am Schluss", end: ["antworten"] }
-  ]},
-  { scene: 0, speaker: "pc", text: "Verstanden, wir treffen uns um zwei Uhr nachmittags, antworten" },
-  { scene: 0, speaker: "user", prompt: "Zwei Uhr geht nicht. Mache einen neuen Vorschlag.", label: "Vier Uhr vorschlagen", checks: [
-    { label: "verstanden zuerst", start: ["verstanden"] },
-    { label: "zwei Uhr geht nicht", allAny: [["zwei", "2"], ["nicht", "geht nicht"]] },
-    { label: "Unterricht oder Schule", any: ["unterricht", "schule"] },
-    { label: "vier Uhr", any: ["vier uhr", "4 uhr", "vier", "4"] },
-    { label: "antworten am Schluss", end: ["antworten"] }
-  ]},
-  { scene: 0, speaker: "pc", text: "Verstanden, Treffpunkt bei der knorrigen Eiche um vier Uhr, Schluss" },
-  { scene: 0, speaker: "user", prompt: "Beende das Gespräch.", label: "Gespräch beenden", checks: [
-    { label: "verstanden zuerst", start: ["verstanden"] },
-    { label: "Ende oder Schluss", any: ["ende", "schluss"] }
-  ]},
+  {
+    scene: 0,
+    speaker: "user",
+    prompt: "Beginne den Anruf.",
+    label: "Anna ruft Bruno",
+    checks: [
+      { label: "Bruno von Anna", type: "funk", any: ["bruno von anna"] },
+      { label: "antworten am Schluss", type: "funk", end: ["antworten"] }
+    ]
+  },
+  {
+    scene: 0,
+    speaker: "pc",
+    text: "Anna von Bruno, verstanden, antworten"
+  },
+  {
+    scene: 0,
+    speaker: "user",
+    prompt: "Frage nach dem Treffpunkt.",
+    label: "Treffpunkt erfragen",
+    checks: [
+      { label: "verstanden zuerst", type: "funk", start: ["verstanden"] },
+      { label: "Treffpunkt-Frage", type: "content", any: ["wo treffen", "wo ist", "treffpunkt", "wo sollen wir uns treffen"] },
+      { label: "antworten am Schluss", type: "funk", end: ["antworten"] }
+    ]
+  },
+  {
+    scene: 0,
+    speaker: "pc",
+    text: "Krrr ... bei der knorrigen Eiche ... krrr ... antworten ...",
+    distorted: true
+  },
+  {
+    scene: 0,
+    speaker: "user",
+    prompt: "Du hast Bruno nicht verstanden.",
+    label: "Wiederholung verlangen",
+    checks: [
+      { label: "nicht verstanden", type: "funk", any: ["nicht verstanden"] },
+      { label: "wiederholen", type: "funk", any: ["wiederholen"] }
+    ]
+  },
+  {
+    scene: 0,
+    speaker: "pc",
+    text: "Ich wiederhole, Treffpunkt bei der knorrigen Eiche, antworten"
+  },
+  {
+    scene: 0,
+    speaker: "user",
+    prompt: "Bestätige den Treffpunkt.",
+    label: "Treffpunkt bestätigen",
+    checks: [
+      { label: "verstanden zuerst", type: "funk", start: ["verstanden"] },
+      { label: "Treffpunkt", type: "content", any: ["treffpunkt", "treffen"] },
+      { label: "knorrige Eiche", type: "content", allAny: [["knorrige", "knorrigen"], ["eiche", "baum"]] },
+      { label: "antworten am Schluss", type: "funk", end: ["antworten"] }
+    ]
+  },
+  {
+    scene: 0,
+    speaker: "pc",
+    text: "Verstanden, wir treffen uns um zwei Uhr nachmittags, antworten"
+  },
+  {
+    scene: 0,
+    speaker: "user",
+    prompt: "Zwei Uhr geht nicht. Mache einen neuen Vorschlag.",
+    label: "Vier Uhr vorschlagen",
+    checks: [
+      { label: "verstanden zuerst", type: "funk", start: ["verstanden"] },
+      { label: "zwei Uhr geht nicht", type: "content", allAny: [["zwei", "2"], ["nicht", "geht nicht"]] },
+      { label: "Unterricht oder Schule", type: "content", any: ["unterricht", "schule"] },
+      { label: "vier Uhr", type: "content", any: ["vier uhr", "4 uhr", "vier", "4"] },
+      { label: "antworten am Schluss", type: "funk", end: ["antworten"] }
+    ]
+  },
+  {
+    scene: 0,
+    speaker: "pc",
+    text: "Verstanden, Treffpunkt bei der knorrigen Eiche um vier Uhr, Schluss"
+  },
+  {
+    scene: 0,
+    speaker: "user",
+    prompt: "Beende das Gespräch.",
+    label: "Gespräch beenden",
+    checks: [
+      { label: "verstanden zuerst", type: "funk", start: ["verstanden"] },
+      { label: "Ende oder Schluss", type: "funk", any: ["ende", "schluss"] }
+    ]
+  },
 
-  { scene: 1, speaker: "pc", text: "Anna von Bruno, bist du in Position, antworten" },
-  { scene: 1, speaker: "user", prompt: "Bestätige deine Position.", label: "Position bestätigen", checks: [
-    { label: "verstanden zuerst", start: ["verstanden"] },
-    { label: "in Position", any: ["in position", "bin in position", "bereit"] },
-    { label: "antworten am Schluss", end: ["antworten"] }
-  ]},
-  { scene: 1, speaker: "pc", text: "Verstanden, siehst du den blauen Bus, antworten" },
-  { scene: 1, speaker: "user", prompt: "Korrigiere die Beobachtung zum Bus.", label: "Busfarbe korrigieren", checks: [
-    { label: "verstanden zuerst", start: ["verstanden"] },
-    { label: "negativ / nein / nicht", any: ["negativ", "nein", "nicht"] },
-    { label: "Bus / Fahrzeug / Auto", any: ["bus", "fahrzeug", "auto"] },
-    { label: "rot", any: ["rot", "roter", "rotes", "rottes"] },
-    { label: "antworten am Schluss", end: ["antworten"] }
-  ]},
-  { scene: 1, speaker: "pc", text: "Verstanden, wie viele Personen sind bei der alten Scheune, antworten" },
-  { scene: 1, speaker: "user", prompt: "Melde die Anzahl Personen bei der Scheune.", label: "Drei Personen melden", checks: [
-    { label: "verstanden zuerst", start: ["verstanden"] },
-    { label: "drei", any: ["drei", "3"] },
-    { label: "Personen / Menschen / Leute", any: ["personen", "menschen", "leute", "männer", "maenner", "kinder"] },
-    { label: "alte Scheune", any: ["alte scheune", "alten scheune", "scheune"] },
-    { label: "antworten am Schluss", end: ["antworten"] }
-  ]},
-  { scene: 1, speaker: "pc", text: "Verstanden, was tun sie, antworten" },
-  { scene: 1, speaker: "user", prompt: "Beschreibe, was die Personen tun.", label: "Feuer beschreiben", checks: [
-    { label: "verstanden zuerst", start: ["verstanden"] },
-    { label: "Feuer", any: ["feuer", "feuerstelle"] },
-    { label: "stehen darum herum", any: ["stehen darum herum", "stehen herum", "stehen drumherum", "sind darum herum"] },
-    { label: "antworten am Schluss", end: ["antworten"] }
-  ]},
-  { scene: 1, speaker: "pc", text: "Verstanden, Auftrag, weiter beobachten, antworten" },
-  { scene: 1, speaker: "user", prompt: "Bestätige den Auftrag und beende.", label: "Auftrag bestätigen und beenden", checks: [
-    { label: "verstanden zuerst", start: ["verstanden"] },
-    { label: "weiter beobachten", allAny: [["beobachte", "beobachten"], ["weiter"]] },
-    { label: "Ende oder Schluss", end: ["ende", "schluss"] }
-  ]},
-  { scene: 1, speaker: "pc", text: "Ende" }
+  {
+    scene: 1,
+    speaker: "pc",
+    text: "Anna von Bruno, bist du in Position, antworten"
+  },
+  {
+    scene: 1,
+    speaker: "user",
+    prompt: "Bestätige deine Position.",
+    label: "Position bestätigen",
+    checks: [
+      { label: "verstanden zuerst", type: "funk", start: ["verstanden"] },
+      { label: "in Position", type: "content", any: ["in position", "bin in position", "bereit"] },
+      { label: "antworten am Schluss", type: "funk", end: ["antworten"] }
+    ]
+  },
+  {
+    scene: 1,
+    speaker: "pc",
+    text: "Verstanden, siehst du den blauen Bus, antworten"
+  },
+  {
+    scene: 1,
+    speaker: "user",
+    prompt: "Korrigiere die Beobachtung zum Bus.",
+    label: "Busfarbe korrigieren",
+    checks: [
+      { label: "verstanden zuerst", type: "funk", start: ["verstanden"] },
+      { label: "negativ / nein / nicht", type: "content", any: ["negativ", "nein", "nicht"] },
+      { label: "Bus / Fahrzeug / Auto", type: "content", any: ["bus", "fahrzeug", "auto"] },
+      { label: "rot", type: "content", any: ["rot", "roter", "rotes", "rottes"] },
+      { label: "antworten am Schluss", type: "funk", end: ["antworten"] }
+    ]
+  },
+  {
+    scene: 1,
+    speaker: "pc",
+    text: "Verstanden, wie viele Personen sind bei der alten Scheune, antworten"
+  },
+  {
+    scene: 1,
+    speaker: "user",
+    prompt: "Melde die Anzahl Personen bei der Scheune.",
+    label: "Drei Personen melden",
+    checks: [
+      { label: "verstanden zuerst", type: "funk", start: ["verstanden"] },
+      { label: "drei", type: "content", any: ["drei", "3"] },
+      { label: "Personen / Menschen / Leute", type: "content", any: ["personen", "menschen", "leute", "männer", "maenner", "kinder"] },
+      { label: "alte Scheune", type: "content", any: ["alte scheune", "alten scheune", "scheune"] },
+      { label: "antworten am Schluss", type: "funk", end: ["antworten"] }
+    ]
+  },
+  {
+    scene: 1,
+    speaker: "pc",
+    text: "Verstanden, was tun sie, antworten"
+  },
+  {
+    scene: 1,
+    speaker: "user",
+    prompt: "Beschreibe, was die Personen tun.",
+    label: "Feuer beschreiben",
+    checks: [
+      { label: "verstanden zuerst", type: "funk", start: ["verstanden"] },
+      { label: "Feuer", type: "content", any: ["feuer", "feuerstelle"] },
+      { label: "stehen darum herum", type: "content", any: ["stehen darum herum", "stehen herum", "stehen drumherum", "sind darum herum"] },
+      { label: "antworten am Schluss", type: "funk", end: ["antworten"] }
+    ]
+  },
+  {
+    scene: 1,
+    speaker: "pc",
+    text: "Verstanden, Auftrag, weiter beobachten, antworten"
+  },
+  {
+    scene: 1,
+    speaker: "user",
+    prompt: "Bestätige den Auftrag und beende.",
+    label: "Auftrag bestätigen und beenden",
+    checks: [
+      { label: "verstanden zuerst", type: "funk", start: ["verstanden"] },
+      { label: "weiter beobachten", type: "content", allAny: [["beobachte", "beobachten"], ["weiter"]] },
+      { label: "Ende oder Schluss", type: "funk", end: ["ende", "schluss"] }
+    ]
+  },
+  {
+    scene: 1,
+    speaker: "pc",
+    text: "Ende"
+  }
 ];
 
 const state = {
@@ -207,10 +313,12 @@ function initSpeechRecognition() {
 
 function startExam() {
   stopAllAudio();
+
   state.stepIndex = -1;
   state.answers = [];
   state.examRunning = true;
   state.readyForUser = false;
+  state.isPressed = false;
   state.currentTranscript = "";
 
   el.startBtn.disabled = true;
@@ -223,6 +331,8 @@ function startExam() {
 
 function nextStep() {
   clearTimeout(state.speakTimer);
+  clearTimeout(state.pressTimer);
+
   state.readyForUser = false;
   state.isPressed = false;
   state.currentTranscript = "";
@@ -259,7 +369,7 @@ function speakPc(text, distorted, callback) {
   setRadio("receive");
 
   try {
-    audio.staticLow.volume = distorted ? 0.8 : 0.22;
+    audio.staticLow.volume = distorted ? 1.0 : 0.22;
     audio.staticLow.currentTime = 0;
     audio.staticLow.play().catch(function () {});
   } catch (e) {}
@@ -281,16 +391,20 @@ function speakPc(text, distorted, callback) {
   if ("speechSynthesis" in window) {
     try {
       window.speechSynthesis.cancel();
+
       const u = new SpeechSynthesisUtterance(text);
       u.lang = "de-CH";
       u.rate = 0.92;
-      u.volume = distorted ? 0.35 : 1;
+      u.volume = distorted ? 0.08 : 1;
       u.onend = done;
       u.onerror = done;
+
       window.speechSynthesis.speak(u);
     } catch (e) {
       done();
     }
+  } else {
+    done();
   }
 }
 
@@ -299,11 +413,13 @@ function startPtt() {
 
   state.isPressed = true;
   state.currentTranscript = "";
+
   setRadio("send");
   playSfx("pttDown");
   el.recordStatus.textContent = "PTT gedrückt. 1 Sekunde warten …";
 
   clearTimeout(state.pressTimer);
+
   state.pressTimer = setTimeout(function () {
     if (!state.isPressed) return;
 
@@ -323,7 +439,9 @@ function stopPtt() {
 
   state.isPressed = false;
   state.readyForUser = false;
+
   clearTimeout(state.pressTimer);
+
   setRadio("standby");
   playSfx("pttUp");
 
@@ -354,6 +472,7 @@ function saveManualAnswer() {
   if (!state.examRunning || !state.readyForUser) return;
 
   const text = el.manualText.value.trim();
+
   state.readyForUser = false;
   state.isPressed = false;
 
@@ -368,6 +487,7 @@ function saveManualAnswer() {
 
 function finishExam() {
   stopAllAudio();
+
   state.examRunning = false;
   state.readyForUser = false;
   state.isPressed = false;
@@ -384,17 +504,7 @@ function finishExam() {
     r.checks.forEach(function (c) {
       if (c.ok) return;
 
-      const label = c.label.toLowerCase();
-
-      if (
-        label.includes("verstanden") ||
-        label.includes("antworten") ||
-        label.includes("ende") ||
-        label.includes("schluss") ||
-        label.includes("bruno von anna") ||
-        label.includes("nicht verstanden") ||
-        label.includes("wiederholen")
-      ) {
+      if (c.type === "funk") {
         funkErrors++;
       } else {
         contentErrors++;
@@ -416,9 +526,11 @@ function finishExam() {
     html += `<h3>${i + 1}. ${escapeHtml(r.label)}</h3>`;
     html += `<div class="transcript">${escapeHtml(r.text || "Keine Antwort erkannt.")}</div>`;
     html += `<p>`;
+
     r.checks.forEach(function (c) {
       html += `<span class="term ${c.ok ? "ok" : "bad"}">${escapeHtml(c.label)}</span>`;
     });
+
     html += `</p>`;
     html += `</div>`;
   });
@@ -444,19 +556,6 @@ function finishExam() {
   el.resultContent.innerHTML = html;
   el.resultOverlay.classList.remove("hidden");
 }
-  if (passed) {
-    html += `<p class="term ok">Bestanden. Notiere das Passwort.</p>`;
-    playSfx("success");
-    playPasswordAudio();
-    sendLearningViewSolved();
-  } else {
-    html += `<p class="term bad">Noch nicht bestanden. Wiederhole die Prüfung und achte auf Reihenfolge, Funkbegriffe und Inhalte.</p>`;
-    playSfx("error");
-  }
-
-  el.resultContent.innerHTML = html;
-  el.resultOverlay.classList.remove("hidden");
-}
 
 function evaluateAnswer(answer) {
   const step = STEPS[answer.stepIndex];
@@ -465,6 +564,7 @@ function evaluateAnswer(answer) {
   const checks = step.checks.map(function (rule) {
     return {
       label: rule.label,
+      type: rule.type || "content",
       ok: checkRule(n, rule)
     };
   });
@@ -473,7 +573,9 @@ function evaluateAnswer(answer) {
     label: answer.label,
     text: answer.text,
     checks,
-    passed: checks.every(c => c.ok)
+    passed: checks.every(function (c) {
+      return c.ok;
+    })
   };
 }
 
@@ -481,7 +583,11 @@ function checkRule(n, rule) {
   if (rule.any) return hasAny(n, rule.any);
   if (rule.start) return startsAny(n, rule.start);
   if (rule.end) return endsAny(n, rule.end);
-  if (rule.allAny) return rule.allAny.every(group => hasAny(n, group));
+  if (rule.allAny) {
+    return rule.allAny.every(function (group) {
+      return hasAny(n, group);
+    });
+  }
   return false;
 }
 
@@ -498,15 +604,21 @@ function normalize(text) {
 }
 
 function hasAny(n, arr) {
-  return arr.some(x => n.includes(normalize(x)));
+  return arr.some(function (x) {
+    return n.includes(normalize(x));
+  });
 }
 
 function startsAny(n, arr) {
-  return arr.some(x => n.startsWith(normalize(x)));
+  return arr.some(function (x) {
+    return n.startsWith(normalize(x));
+  });
 }
 
 function endsAny(n, arr) {
-  return arr.some(x => n.endsWith(normalize(x)));
+  return arr.some(function (x) {
+    return n.endsWith(normalize(x));
+  });
 }
 
 function setRadio(mode) {
@@ -532,6 +644,7 @@ function stopStatic() {
 
 function stopAllAudio() {
   clearTimeout(state.speakTimer);
+  clearTimeout(state.pressTimer);
   stopStatic();
 
   try {
@@ -574,10 +687,12 @@ function escapeHtml(str) {
 document.addEventListener("keydown", function (e) {
   if (state.waitingForCustomKey) {
     e.preventDefault();
+
     state.pttKey = e.code;
     state.waitingForCustomKey = false;
     el.keyLabel.textContent = keyName(e.code);
     el.recordStatus.textContent = "PTT-Taste gespeichert.";
+
     return;
   }
 
@@ -596,9 +711,11 @@ document.addEventListener("keyup", function (e) {
 
 el.startBtn.addEventListener("click", startExam);
 el.retryBtn.addEventListener("click", startExam);
+
 el.closeBtn.addEventListener("click", function () {
   el.resultOverlay.classList.add("hidden");
 });
+
 el.changeKeyBtn.addEventListener("click", setCustomKey);
 el.saveManualBtn.addEventListener("click", saveManualAnswer);
 
