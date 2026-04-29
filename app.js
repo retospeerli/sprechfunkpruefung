@@ -2,19 +2,7 @@
 
 /* ============================================================
    FUNKERSCHULE PRÜFUNGS-APP
-   Finale Version
-   - Offline-Frontend
-   - HTML/CSS/Vanilla JS
-   - keine externen Libraries
-   - Prüfung mit zwei festen Szenen
-   - keine Sofortkorrektur
-   - Auswertung erst am Schluss
-   ============================================================ */
-
-
-/* ============================================================
-   ASSETS
-   Alle Dateien lokal ablegen.
+   Finale Version app.js
    ============================================================ */
 
 const ASSETS = {
@@ -33,17 +21,12 @@ const ASSETS = {
     error: "audio/sfx/error.wav"
   },
 
-  // Wird nach bestandener Prüfung automatisch abgespielt
-  // und zusätzlich per Button nochmals abspielbar gemacht.
   passwordAudio: "audio/passwort4.mp3"
 };
 
 
 /* ============================================================
    SZENEN / AUFTRAGSKARTEN
-   Wichtig:
-   Die Auftragskarte enthält nur Stichwörter.
-   Keine vollständigen Funksprüche zum Ablesen.
    ============================================================ */
 
 const SCENES = [
@@ -85,21 +68,9 @@ const SCENES = [
 
 /* ============================================================
    PRÜFUNGSDIALOG
-   speaker: "pc"   = Computer spricht automatisch
-   speaker: "user" = Lernende Person spricht per PTT-Taste
-
-   Prüfkonzept:
-   - Funkdisziplin wird als type: "funk" markiert.
-   - Inhalt wird als type: "content" markiert.
-   - Pro Antwort muss nicht jedes Inhaltsdetail stimmen.
-   - Es reicht mindestens EIN zentrales Inhaltsdetail pro Antwort.
    ============================================================ */
 
 const STEPS = [
-  /* ------------------------------------------------------------
-     SZENE 1: TREFFPUNKT VEREINBAREN
-     ------------------------------------------------------------ */
-
   {
     scene: 0,
     speaker: "user",
@@ -132,11 +103,6 @@ const STEPS = [
   {
     scene: 0,
     speaker: "pc",
-
-    // Änderung:
-    // Diese Nachricht soll absichtlich kaum verständlich sein.
-    // In speakPc() wird bei distorted die Stimme extrem leise
-    // und das Störgeräusch übersteuert laut abgespielt.
     text: "Krrr ... bei der knorrigen Eiche ... krrr ... antworten ...",
     distorted: true
   },
@@ -165,11 +131,8 @@ const STEPS = [
     label: "Treffpunkt bestätigen",
     checks: [
       { label: "verstanden zuerst", type: "funk", start: ["verstanden"] },
-
-      // Inhaltlich genügt später mindestens eines dieser Details.
       { label: "Treffpunkt", type: "content", any: ["treffpunkt", "treffen"] },
       { label: "knorrige Eiche", type: "content", allAny: [["knorrige", "knorrigen"], ["eiche", "baum"]] },
-
       { label: "antworten am Schluss", type: "funk", end: ["antworten"] }
     ]
   },
@@ -177,10 +140,6 @@ const STEPS = [
   {
     scene: 0,
     speaker: "pc",
-
-    // Änderung:
-    // Bruno schlägt die Zeit selbst vor.
-    // Anna muss nicht zuerst separat nach der Zeit fragen.
     text: "Verstanden, wir treffen uns um zwei Uhr nachmittags, antworten"
   },
 
@@ -191,14 +150,9 @@ const STEPS = [
     label: "Vier Uhr vorschlagen",
     checks: [
       { label: "verstanden zuerst", type: "funk", start: ["verstanden"] },
-
-      // Inhaltsprüfung tolerant:
-      // Es reicht mindestens ein korrektes Detail,
-      // die Gesamtwertung erlaubt zusätzlich Fehler.
       { label: "zwei Uhr geht nicht", type: "content", allAny: [["zwei", "2"], ["nicht", "geht nicht"]] },
       { label: "Unterricht oder Schule", type: "content", any: ["unterricht", "schule"] },
       { label: "vier Uhr", type: "content", any: ["vier uhr", "4 uhr", "vier", "4"] },
-
       { label: "antworten am Schluss", type: "funk", end: ["antworten"] }
     ]
   },
@@ -219,15 +173,6 @@ const STEPS = [
       { label: "Ende oder Schluss", type: "funk", any: ["ende", "schluss"] }
     ]
   },
-
-
-  /* ------------------------------------------------------------
-     SZENE 2: BEOBACHTUNG MIT FERNGALS
-     Korrektur:
-     Bruno ruft zuerst nur Anna.
-     Anna kann sich zuerst korrekt identifizieren.
-     Erst danach stellt Bruno die Frage zur Position.
-     ------------------------------------------------------------ */
 
   {
     scene: 1,
@@ -278,15 +223,10 @@ const STEPS = [
     label: "Busfarbe korrigieren",
     checks: [
       { label: "verstanden zuerst", type: "funk", start: ["verstanden"] },
-
-      // Neues Prüfkonzept:
-      // Inhaltlich reicht ein korrektes Detail:
-      // z.B. „negativ“, „nicht blau“, „roter Bus“, „rotes Auto/Fahrzeug“.
       { label: "negativ / nein / nicht", type: "content", any: ["negativ", "nein", "nicht"] },
       { label: "Bus / Fahrzeug / Auto", type: "content", any: ["bus", "fahrzeug", "auto"] },
       { label: "rot", type: "content", any: ["rot", "roter", "rotes", "rottes"] },
       { label: "nicht blau", type: "content", allAny: [["nicht", "negativ", "nein"], ["blau", "blauer", "blauen"]] },
-
       { label: "antworten am Schluss", type: "funk", end: ["antworten"] }
     ]
   },
@@ -304,12 +244,9 @@ const STEPS = [
     label: "Drei Personen melden",
     checks: [
       { label: "verstanden zuerst", type: "funk", start: ["verstanden"] },
-
-      // Zulässige Varianten: Leute, Menschen, Männer, Kinder usw.
       { label: "drei", type: "content", any: ["drei", "3"] },
       { label: "Personen / Menschen / Leute", type: "content", any: ["personen", "menschen", "leute", "männer", "maenner", "kinder"] },
       { label: "alte Scheune", type: "content", any: ["alte scheune", "alten scheune", "scheune", "stall"] },
-
       { label: "antworten am Schluss", type: "funk", end: ["antworten"] }
     ]
   },
@@ -327,12 +264,8 @@ const STEPS = [
     label: "Feuer beschreiben",
     checks: [
       { label: "verstanden zuerst", type: "funk", start: ["verstanden"] },
-
-      // Auch hier reicht inhaltlich ein zentrales Detail:
-      // Feuer ODER stehen herum.
       { label: "Feuer", type: "content", any: ["feuer", "feuerstelle", "feuer gemacht"] },
       { label: "stehen herum", type: "content", any: ["stehen darum herum", "stehen herum", "stehen drumherum", "sind darum herum", "um das feuer"] },
-
       { label: "antworten am Schluss", type: "funk", end: ["antworten"] }
     ]
   },
@@ -350,12 +283,7 @@ const STEPS = [
     label: "Auftrag bestätigen und beenden",
     checks: [
       { label: "verstanden zuerst", type: "funk", start: ["verstanden"] },
-
-      // Inhaltlich tolerant:
-      // „ich beobachte weiter“ genügt.
       { label: "weiter beobachten", type: "content", allAny: [["beobachte", "beobachten"], ["weiter"]] },
-
-      // Schluss darf Ende oder Schluss sein.
       { label: "Ende oder Schluss", type: "funk", end: ["ende", "schluss"] }
     ]
   },
@@ -376,7 +304,6 @@ const state = {
   stepIndex: -1,
   answers: [],
 
-  // Standard-PTT: Leertaste
   pttKey: "Space",
   waitingForCustomKey: false,
 
@@ -442,9 +369,6 @@ const passwordAudio = new Audio(ASSETS.passwordAudio);
 
 /* ============================================================
    SPRACHERKENNUNG
-   Hinweis:
-   Browser-Spracherkennung funktioniert nicht vollständig offline.
-   Deshalb gibt es eine Notfall-Eingabe.
    ============================================================ */
 
 function initSpeechRecognition() {
@@ -475,18 +399,23 @@ function initSpeechRecognition() {
   };
 
   state.recognition.onerror = function () {
-    // Bei Problemen wird die manuelle Eingabe eingeblendet.
     el.manualFallback.classList.remove("hidden");
   };
 }
 
 
 /* ============================================================
-   PRÜFUNG STARTEN
+   PRÜFUNG STARTEN / WIEDERHOLEN
    ============================================================ */
 
 function startExam() {
   stopAllAudio();
+
+  // Wichtig: Overlay sicher schliessen.
+  // Dadurch funktioniert auch „Prüfung wiederholen“ zuverlässig.
+  el.resultOverlay.classList.add("hidden");
+  el.resultContent.innerHTML = "";
+  el.resultTitle.textContent = "Auswertung";
 
   state.stepIndex = -1;
   state.answers = [];
@@ -496,16 +425,20 @@ function startExam() {
   state.currentTranscript = "";
 
   el.startBtn.disabled = true;
-  el.resultOverlay.classList.add("hidden");
   el.recordStatus.textContent = "Prüfung startet.";
   el.pcText.textContent = "Bereit.";
+
+  try {
+    passwordAudio.pause();
+    passwordAudio.currentTime = 0;
+  } catch (e) {}
 
   nextStep();
 }
 
 
 /* ============================================================
-   NÄCHSTER DIALOGSCHRITT
+   NÄCHSTER SCHRITT
    ============================================================ */
 
 function nextStep() {
@@ -540,7 +473,7 @@ function nextStep() {
     });
   } else {
     el.pcText.textContent = step.prompt;
-    el.recordStatus.textContent = "Jetzt antworten: Leertaste halten, 1 Sekunde warten, sprechen, loslassen.";
+    el.recordStatus.textContent = "Jetzt antworten: Leertaste halten, kurz warten, sprechen, loslassen.";
     state.readyForUser = true;
   }
 }
@@ -548,17 +481,13 @@ function nextStep() {
 
 /* ============================================================
    COMPUTER SPRICHT
-   Robuste Version:
-   Falls speechSynthesis.onend hängen bleibt,
-   läuft ein Fallback-Timer weiter.
+   Buzz wird nur am Ende von Brunos Sendung abgespielt.
    ============================================================ */
 
 function speakPc(text, distorted, callback) {
   setRadio("receive");
 
   try {
-    // Änderung:
-    // Gestörte Meldung wird absichtlich massiv übersteuert.
     audio.staticLow.volume = distorted ? 1.0 : 0.22;
     audio.staticLow.currentTime = 0;
     audio.staticLow.play().catch(function () {});
@@ -573,12 +502,16 @@ function speakPc(text, distorted, callback) {
     clearTimeout(state.speakTimer);
 
     stopStatic();
+
+    // Änderung:
+    // buzz.wav markiert nur das Ende der Sendung von Bruno.
+    playSfx("buzz");
+
     setRadio("standby");
 
     setTimeout(callback, 350);
   }
 
-  // Fallback gegen Einfrieren der App
   const fallbackMs = Math.max(1800, text.length * 95);
   state.speakTimer = setTimeout(done, fallbackMs);
 
@@ -589,11 +522,7 @@ function speakPc(text, distorted, callback) {
       const u = new SpeechSynthesisUtterance(text);
       u.lang = "de-CH";
       u.rate = 0.92;
-
-      // Änderung:
-      // Bei der gestörten Nachricht ist die Stimme extrem leise.
       u.volume = distorted ? 0.08 : 1;
-
       u.onend = done;
       u.onerror = done;
 
@@ -609,8 +538,8 @@ function speakPc(text, distorted, callback) {
 
 /* ============================================================
    PTT STARTEN
-   Die sichtbare PTT-Taste wurde entfernt.
-   Ausgelöst wird über die gewählte Tastaturtaste.
+   Aufnahmeverzögerung: 0.6 Sekunden
+   Kein Buzz beim User.
    ============================================================ */
 
 function startPtt() {
@@ -622,33 +551,28 @@ function startPtt() {
   setRadio("send");
   playSfx("pttDown");
 
-  el.recordStatus.textContent = "PTT gedrückt. 1 Sekunde warten …";
+  el.recordStatus.textContent = "PTT gedrückt. Kurz warten …";
 
   clearTimeout(state.pressTimer);
 
-  // Funkverzögerung: erst nach 1 Sekunde sprechen
   state.pressTimer = setTimeout(function () {
     if (!state.isPressed) return;
 
-    playSfx("buzz");
+    // Kein buzz.wav beim User.
+    // Die Aufnahme beginnt still.
     el.recordStatus.textContent = "Jetzt sprechen.";
 
     if (state.recognitionAvailable && state.recognition) {
       try {
         state.recognition.start();
-      } catch (e) {
-        // Falls bereits gestartet oder Browser blockiert:
-        // keine Unterbrechung der Prüfung.
-      }
+      } catch (e) {}
     }
-  }, 1000);
+  }, 600);
 }
 
 
 /* ============================================================
    PTT LOSLASSEN
-   Erst nach Loslassen wird die Antwort gespeichert.
-   Keine Sofortauswertung.
    ============================================================ */
 
 function stopPtt() {
@@ -692,7 +616,7 @@ function saveCurrentAnswer(text) {
 
 
 /* ============================================================
-   NOTFALL-EINGABE SPEICHERN
+   NOTFALL-EINGABE
    ============================================================ */
 
 function saveManualAnswer() {
@@ -714,12 +638,7 @@ function saveManualAnswer() {
 
 
 /* ============================================================
-   PRÜFUNG ABSCHLIESSEN UND AUSWERTEN
-   Änderung:
-   - maximal 2 Funkdisziplin-Fehler erlaubt
-   - maximal 3 Inhaltsfehler erlaubt
-   - pro Antwort zählt ein Inhaltsfehler nur dann,
-     wenn KEIN zentrales Inhaltsdetail stimmt
+   PRÜFUNG ABSCHLIESSEN
    ============================================================ */
 
 function finishExam() {
@@ -746,13 +665,10 @@ function finishExam() {
       return c.type === "content";
     });
 
-    // Funkfehler werden einzeln gezählt.
     funkChecks.forEach(function (c) {
       if (!c.ok) funkErrors++;
     });
 
-    // Inhaltsfehler:
-    // Pro Antwort nur 1 Fehler, wenn gar kein Inhaltsdetail stimmt.
     if (contentChecks.length > 0) {
       const atLeastOneContentOk = contentChecks.some(function (c) {
         return c.ok;
@@ -809,8 +725,6 @@ function finishExam() {
     playPasswordAudio();
     sendLearningViewSolved();
 
-    // Änderung:
-    // Passwort kann nochmals abgespielt werden.
     setTimeout(function () {
       const btn = document.getElementById("playPasswordBtn");
 
@@ -829,12 +743,7 @@ function finishExam() {
 
 
 /* ============================================================
-   EINZELANTWORT AUSWERTEN
-   Wichtig:
-   Eine Antwort gilt intern als bestanden, wenn:
-   - alle Funkregeln in dieser Antwort stimmen
-   - und mindestens ein Inhaltsdetail stimmt
-   Die Gesamtprüfung verwendet zusätzlich Fehlertoleranzen.
+   AUSWERTUNG EINER ANTWORT
    ============================================================ */
 
 function evaluateAnswer(answer) {
@@ -877,11 +786,7 @@ function evaluateAnswer(answer) {
 
 
 /* ============================================================
-   REGELPRÜFUNG
-   any    = irgendein Begriff muss vorkommen
-   start  = Antwort muss damit beginnen
-   end    = Antwort muss damit enden
-   allAny = aus jeder Gruppe muss mindestens ein Begriff vorkommen
+   REGELN PRÜFEN
    ============================================================ */
 
 function checkRule(n, rule) {
@@ -901,10 +806,6 @@ function checkRule(n, rule) {
 
 /* ============================================================
    TEXT NORMALISIEREN
-   Macht Prüfung toleranter:
-   - Gross/Kleinschreibung egal
-   - Umlaute vereinheitlicht
-   - Satzzeichen entfernt
    ============================================================ */
 
 function normalize(text) {
@@ -939,7 +840,7 @@ function endsAny(n, arr) {
 
 
 /* ============================================================
-   FUNKGERÄT-BILD SETZEN
+   FUNKGERÄT-BILD
    ============================================================ */
 
 function setRadio(mode) {
@@ -948,7 +849,7 @@ function setRadio(mode) {
 
 
 /* ============================================================
-   SOUND HILFSFUNKTIONEN
+   SOUND
    ============================================================ */
 
 function playSfx(name) {
@@ -991,7 +892,7 @@ function playPasswordAudio() {
 
 
 /* ============================================================
-   LEARNINGVIEW ABSCHLUSS
+   LEARNINGVIEW
    ============================================================ */
 
 function sendLearningViewSolved() {
@@ -1020,7 +921,7 @@ function keyName(code) {
 
 
 /* ============================================================
-   HTML SICHER AUSGEBEN
+   HTML SICHERN
    ============================================================ */
 
 function escapeHtml(str) {
@@ -1033,7 +934,6 @@ function escapeHtml(str) {
 
 /* ============================================================
    TASTATURSTEUERUNG
-   Leertaste gedrückt halten = PTT
    ============================================================ */
 
 document.addEventListener("keydown", function (e) {
@@ -1064,11 +964,10 @@ document.addEventListener("keyup", function (e) {
 
 
 /* ============================================================
-   BUTTON-EVENTS
+   BUTTONS
    ============================================================ */
 
 el.startBtn.addEventListener("click", startExam);
-
 el.retryBtn.addEventListener("click", startExam);
 
 el.closeBtn.addEventListener("click", function () {
@@ -1076,12 +975,11 @@ el.closeBtn.addEventListener("click", function () {
 });
 
 el.changeKeyBtn.addEventListener("click", setCustomKey);
-
 el.saveManualBtn.addEventListener("click", saveManualAnswer);
 
 
 /* ============================================================
-   APP INITIALISIEREN
+   START
    ============================================================ */
 
 initSpeechRecognition();
