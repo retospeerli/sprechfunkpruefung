@@ -3,6 +3,11 @@
 /* ============================================================
    FUNKERSCHULE PRÜFUNGS-APP
    Finale Version app.js
+   - semantisch tolerantere Prüfung
+   - automatische Wiederholung bei fehlendem Kerninhalt
+   - kein Klick zwischen Funksprüchen
+   - Buzz nur am Ende von Brunos Sendung
+   - Aufnahmeverzögerung 0.6 Sekunden
    ============================================================ */
 
 const ASSETS = {
@@ -67,6 +72,166 @@ const SCENES = [
 
 
 /* ============================================================
+   SEMANTISCHE BEDEUTUNGSGRUPPEN
+   Diese Gruppen machen die Prüfung deutlich klüger.
+   Es wird nicht stur ein Wort gesucht, sondern die Bedeutung.
+   ============================================================ */
+
+const CONCEPTS = {
+  treffpunktFrage: [
+    "wo treffen",
+    "wo treffen wir",
+    "wo sollen wir",
+    "wo ist der treffpunkt",
+    "treffpunkt",
+    "wo machen wir ab",
+    "wo kommen wir zusammen"
+  ],
+
+  treffpunktEiche: [
+    "knorrige eiche",
+    "knorrigen eiche",
+    "bei der eiche",
+    "beim baum",
+    "beim alten baum",
+    "beim knorrigen baum",
+    "treffpunkt eiche",
+    "treffpunkt bei der eiche"
+  ],
+
+  zweiUhrGehtNicht: [
+    "zwei uhr geht nicht",
+    "2 uhr geht nicht",
+    "zwei geht nicht",
+    "2 geht nicht",
+    "nicht um zwei",
+    "nicht um 2",
+    "um zwei kann ich nicht",
+    "um 2 kann ich nicht"
+  ],
+
+  unterricht: [
+    "unterricht",
+    "schule",
+    "schulunterricht",
+    "ich habe noch schule",
+    "ich habe unterricht",
+    "bin noch in der schule"
+  ],
+
+  vierUhr: [
+    "vier uhr",
+    "4 uhr",
+    "um vier",
+    "um 4",
+    "vorschlag vier",
+    "vorschlage vier",
+    "ich schlage vier vor",
+    "ich schlage 4 vor"
+  ],
+
+  position: [
+    "in position",
+    "bin in position",
+    "ich bin in position",
+    "bereit",
+    "ich bin bereit",
+    "auf position",
+    "ich bin da"
+  ],
+
+  roterBus: [
+    "roter bus",
+    "rotes bus",
+    "bus ist rot",
+    "der bus ist rot",
+    "rotes fahrzeug",
+    "roter wagen",
+    "rotes auto",
+    "auto ist rot",
+    "fahrzeug ist rot",
+    "rot"
+  ],
+
+  nichtBlau: [
+    "nicht blau",
+    "kein blauer bus",
+    "kein blau",
+    "negativ blau",
+    "negativ der bus",
+    "nein der bus",
+    "der bus ist nicht blau",
+    "das fahrzeug ist nicht blau"
+  ],
+
+  busFahrzeug: [
+    "bus",
+    "fahrzeug",
+    "auto",
+    "wagen"
+  ],
+
+  dreiPersonen: [
+    "drei personen",
+    "3 personen",
+    "drei menschen",
+    "3 menschen",
+    "drei leute",
+    "3 leute",
+    "drei maenner",
+    "drei männer",
+    "3 maenner",
+    "3 männer",
+    "drei kinder",
+    "3 kinder",
+    "drei"
+  ],
+
+  scheune: [
+    "alte scheune",
+    "alten scheune",
+    "bei der scheune",
+    "scheune",
+    "stall",
+    "alter stall",
+    "alten stall"
+  ],
+
+  feuerOderHerumstehen: [
+    "feuer",
+    "feuerstelle",
+    "feuer gemacht",
+    "haben feuer gemacht",
+    "machen feuer",
+    "stehen herum",
+    "stehen darum herum",
+    "stehen drumherum",
+    "stehen rundherum",
+    "um das feuer",
+    "beim feuer",
+    "sie stehen",
+    "sie sind um das feuer"
+  ],
+
+  weiterBeobachten: [
+    "ich beobachte weiter",
+    "beobachte weiter",
+    "weiter beobachten",
+    "ich beobachte weiterhin",
+    "beobachte weiterhin",
+    "ich bleibe dran",
+    "bleibe dran",
+    "ich mache weiter",
+    "mache weiter",
+    "ich schaue weiter",
+    "schaue weiter",
+    "ich überwache weiter",
+    "ich ueberwache weiter"
+  ]
+};
+
+
+/* ============================================================
    PRÜFUNGSDIALOG
    ============================================================ */
 
@@ -95,7 +260,7 @@ const STEPS = [
     label: "Treffpunkt erfragen",
     checks: [
       { label: "verstanden zuerst", type: "funk", start: ["verstanden"] },
-      { label: "Treffpunkt-Frage", type: "content", any: ["wo treffen", "wo ist", "treffpunkt", "wo sollen wir uns treffen"] },
+      { label: "Treffpunkt-Frage", type: "content", concept: "treffpunktFrage" },
       { label: "antworten am Schluss", type: "funk", end: ["antworten"] }
     ]
   },
@@ -131,8 +296,7 @@ const STEPS = [
     label: "Treffpunkt bestätigen",
     checks: [
       { label: "verstanden zuerst", type: "funk", start: ["verstanden"] },
-      { label: "Treffpunkt", type: "content", any: ["treffpunkt", "treffen"] },
-      { label: "knorrige Eiche", type: "content", allAny: [["knorrige", "knorrigen"], ["eiche", "baum"]] },
+      { label: "Treffpunkt / knorrige Eiche", type: "content", concept: "treffpunktEiche" },
       { label: "antworten am Schluss", type: "funk", end: ["antworten"] }
     ]
   },
@@ -150,9 +314,9 @@ const STEPS = [
     label: "Vier Uhr vorschlagen",
     checks: [
       { label: "verstanden zuerst", type: "funk", start: ["verstanden"] },
-      { label: "zwei Uhr geht nicht", type: "content", allAny: [["zwei", "2"], ["nicht", "geht nicht"]] },
-      { label: "Unterricht oder Schule", type: "content", any: ["unterricht", "schule"] },
-      { label: "vier Uhr", type: "content", any: ["vier uhr", "4 uhr", "vier", "4"] },
+      { label: "zwei Uhr geht nicht", type: "content", concept: "zweiUhrGehtNicht" },
+      { label: "Unterricht oder Schule", type: "content", concept: "unterricht" },
+      { label: "vier Uhr", type: "content", concept: "vierUhr" },
       { label: "antworten am Schluss", type: "funk", end: ["antworten"] }
     ]
   },
@@ -205,7 +369,7 @@ const STEPS = [
     label: "Position bestätigen",
     checks: [
       { label: "verstanden zuerst", type: "funk", start: ["verstanden"] },
-      { label: "in Position oder bereit", type: "content", any: ["in position", "bin in position", "bereit"] },
+      { label: "in Position oder bereit", type: "content", concept: "position" },
       { label: "antworten am Schluss", type: "funk", end: ["antworten"] }
     ]
   },
@@ -223,10 +387,8 @@ const STEPS = [
     label: "Busfarbe korrigieren",
     checks: [
       { label: "verstanden zuerst", type: "funk", start: ["verstanden"] },
-      { label: "negativ / nein / nicht", type: "content", any: ["negativ", "nein", "nicht"] },
-      { label: "Bus / Fahrzeug / Auto", type: "content", any: ["bus", "fahrzeug", "auto"] },
-      { label: "rot", type: "content", any: ["rot", "roter", "rotes", "rottes"] },
-      { label: "nicht blau", type: "content", allAny: [["nicht", "negativ", "nein"], ["blau", "blauer", "blauen"]] },
+      { label: "rot / nicht blau", type: "content", anyConcept: ["roterBus", "nichtBlau"] },
+      { label: "Bus / Fahrzeug / Auto", type: "content", concept: "busFahrzeug" },
       { label: "antworten am Schluss", type: "funk", end: ["antworten"] }
     ]
   },
@@ -244,9 +406,8 @@ const STEPS = [
     label: "Drei Personen melden",
     checks: [
       { label: "verstanden zuerst", type: "funk", start: ["verstanden"] },
-      { label: "drei", type: "content", any: ["drei", "3"] },
-      { label: "Personen / Menschen / Leute", type: "content", any: ["personen", "menschen", "leute", "männer", "maenner", "kinder"] },
-      { label: "alte Scheune", type: "content", any: ["alte scheune", "alten scheune", "scheune", "stall"] },
+      { label: "drei Personen / Leute / Menschen", type: "content", concept: "dreiPersonen" },
+      { label: "alte Scheune", type: "content", concept: "scheune" },
       { label: "antworten am Schluss", type: "funk", end: ["antworten"] }
     ]
   },
@@ -264,8 +425,7 @@ const STEPS = [
     label: "Feuer beschreiben",
     checks: [
       { label: "verstanden zuerst", type: "funk", start: ["verstanden"] },
-      { label: "Feuer", type: "content", any: ["feuer", "feuerstelle", "feuer gemacht"] },
-      { label: "stehen herum", type: "content", any: ["stehen darum herum", "stehen herum", "stehen drumherum", "sind darum herum", "um das feuer"] },
+      { label: "Feuer oder Herumstehen", type: "content", concept: "feuerOderHerumstehen" },
       { label: "antworten am Schluss", type: "funk", end: ["antworten"] }
     ]
   },
@@ -283,7 +443,7 @@ const STEPS = [
     label: "Auftrag bestätigen und beenden",
     checks: [
       { label: "verstanden zuerst", type: "funk", start: ["verstanden"] },
-      { label: "weiter beobachten", type: "content", allAny: [["beobachte", "beobachten"], ["weiter"]] },
+      { label: "weiter beobachten", type: "content", concept: "weiterBeobachten" },
       { label: "Ende oder Schluss", type: "funk", end: ["ende", "schluss"] }
     ]
   },
@@ -317,7 +477,16 @@ const state = {
   readyForUser: false,
 
   pressTimer: null,
-  speakTimer: null
+  speakTimer: null,
+  saveTimer: null,
+
+  // Automatische Wiederholung bei fehlendem Kerninhalt
+  repeat: {
+    active: false,
+    stepIndex: null,
+    firstText: "",
+    usedForSteps: {}
+  }
 };
 
 
@@ -411,8 +580,6 @@ function initSpeechRecognition() {
 function startExam() {
   stopAllAudio();
 
-  // Wichtig: Overlay sicher schliessen.
-  // Dadurch funktioniert auch „Prüfung wiederholen“ zuverlässig.
   el.resultOverlay.classList.add("hidden");
   el.resultContent.innerHTML = "";
   el.resultTitle.textContent = "Auswertung";
@@ -423,6 +590,11 @@ function startExam() {
   state.readyForUser = false;
   state.isPressed = false;
   state.currentTranscript = "";
+
+  state.repeat.active = false;
+  state.repeat.stepIndex = null;
+  state.repeat.firstText = "";
+  state.repeat.usedForSteps = {};
 
   el.startBtn.disabled = true;
   el.recordStatus.textContent = "Prüfung startet.";
@@ -444,6 +616,7 @@ function startExam() {
 function nextStep() {
   clearTimeout(state.speakTimer);
   clearTimeout(state.pressTimer);
+  clearTimeout(state.saveTimer);
 
   state.readyForUser = false;
   state.isPressed = false;
@@ -472,10 +645,14 @@ function nextStep() {
       nextStep();
     });
   } else {
-    el.pcText.textContent = step.prompt;
-    el.recordStatus.textContent = "Jetzt antworten: Leertaste halten, kurz warten, sprechen, loslassen.";
-    state.readyForUser = true;
+    showUserPrompt(step.prompt);
   }
+}
+
+function showUserPrompt(prompt) {
+  el.pcText.textContent = prompt;
+  el.recordStatus.textContent = "Jetzt antworten: Leertaste halten, kurz warten, sprechen, loslassen.";
+  state.readyForUser = true;
 }
 
 
@@ -502,11 +679,7 @@ function speakPc(text, distorted, callback) {
     clearTimeout(state.speakTimer);
 
     stopStatic();
-
-    // Änderung:
-    // buzz.wav markiert nur das Ende der Sendung von Bruno.
     playSfx("buzz");
-
     setRadio("standby");
 
     setTimeout(callback, 350);
@@ -558,8 +731,6 @@ function startPtt() {
   state.pressTimer = setTimeout(function () {
     if (!state.isPressed) return;
 
-    // Kein buzz.wav beim User.
-    // Die Aufnahme beginnt still.
     el.recordStatus.textContent = "Jetzt sprechen.";
 
     if (state.recognitionAvailable && state.recognition) {
@@ -573,6 +744,8 @@ function startPtt() {
 
 /* ============================================================
    PTT LOSLASSEN
+   Nachlauf: 500 ms, damit verspätete Speech-Resultate
+   noch gespeichert werden können.
    ============================================================ */
 
 function stopPtt() {
@@ -592,26 +765,106 @@ function stopPtt() {
     } catch (e) {}
   }
 
-  saveCurrentAnswer(state.currentTranscript.trim());
+  el.recordStatus.textContent = "Antwort wird gespeichert …";
+
+  clearTimeout(state.saveTimer);
+
+  state.saveTimer = setTimeout(function () {
+    saveCurrentAnswer(state.currentTranscript.trim());
+  }, 500);
 }
 
 
 /* ============================================================
    ANTWORT SPEICHERN
+   Mit automatischer Wiederholungsanforderung:
+   Wenn bei einem prüfungsrelevanten Inhalt gar kein Kerninhalt
+   erkannt wurde, fragt Bruno einmal nach:
+   „Nicht verstanden, wiederholen, antworten.“
    ============================================================ */
 
 function saveCurrentAnswer(text) {
   const step = STEPS[state.stepIndex];
 
+  if (!step || step.speaker !== "user") return;
+
+  if (state.repeat.active && state.repeat.stepIndex === state.stepIndex) {
+    const combinedText = joinTexts(state.repeat.firstText, text);
+
+    state.answers.push({
+      stepIndex: state.stepIndex,
+      label: step.label,
+      text: combinedText,
+      firstText: state.repeat.firstText,
+      repeatText: text,
+      repeated: true
+    });
+
+    state.repeat.active = false;
+    state.repeat.stepIndex = null;
+    state.repeat.firstText = "";
+
+    el.recordStatus.textContent = "Wiederholung gespeichert. Keine Auswertung während der Prüfung.";
+
+    setTimeout(nextStep, 700);
+    return;
+  }
+
+  if (shouldRequestRepeat(step, text)) {
+    state.repeat.active = true;
+    state.repeat.stepIndex = state.stepIndex;
+    state.repeat.firstText = text;
+    state.repeat.usedForSteps[state.stepIndex] = true;
+
+    el.recordStatus.textContent = "Verbindung schlecht. Bruno verlangt eine Wiederholung.";
+
+    speakPc("Nicht verstanden, wiederholen, antworten", false, function () {
+      showUserPrompt("Wiederhole deine Meldung. Beginne mit: verstanden, ich wiederhole …");
+    });
+
+    return;
+  }
+
   state.answers.push({
     stepIndex: state.stepIndex,
     label: step.label,
-    text: text
+    text: text,
+    repeated: false
   });
 
   el.recordStatus.textContent = "Antwort gespeichert. Keine Auswertung während der Prüfung.";
 
   setTimeout(nextStep, 700);
+}
+
+function shouldRequestRepeat(step, text) {
+  if (!step || !step.checks) return false;
+
+  if (state.repeat.usedForSteps[state.stepIndex]) return false;
+
+  const contentChecks = step.checks.filter(function (c) {
+    return c.type === "content";
+  });
+
+  if (contentChecks.length === 0) return false;
+
+  const n = normalize(text);
+
+  const atLeastOneContentOk = contentChecks.some(function (rule) {
+    return checkRule(n, rule);
+  });
+
+  return !atLeastOneContentOk;
+}
+
+function joinTexts(first, second) {
+  const a = String(first || "").trim();
+  const b = String(second || "").trim();
+
+  if (!a) return b;
+  if (!b) return a;
+
+  return a + " | Wiederholung: " + b;
 }
 
 
@@ -639,6 +892,9 @@ function saveManualAnswer() {
 
 /* ============================================================
    PRÜFUNG ABSCHLIESSEN
+   - maximal 2 Funkdisziplin-Fehler
+   - maximal 3 Inhaltsfehler
+   - pro Antwort nur 1 Inhaltsfehler, wenn gar kein Kerninhalt stimmt
    ============================================================ */
 
 function finishExam() {
@@ -692,7 +948,16 @@ function finishExam() {
   results.forEach(function (r, i) {
     html += `<div class="result-step">`;
     html += `<h3>${i + 1}. ${escapeHtml(r.label)}</h3>`;
-    html += `<div class="transcript">${escapeHtml(r.text || "Keine Antwort erkannt.")}</div>`;
+
+    if (r.repeated) {
+      html += `<p><strong>Erster Versuch:</strong></p>`;
+      html += `<div class="transcript">${escapeHtml(r.firstText || "Keine Antwort erkannt.")}</div>`;
+      html += `<p><strong>Wiederholung:</strong></p>`;
+      html += `<div class="transcript">${escapeHtml(r.repeatText || "Keine Wiederholung erkannt.")}</div>`;
+    } else {
+      html += `<div class="transcript">${escapeHtml(r.text || "Keine Antwort erkannt.")}</div>`;
+    }
+
     html += `<p>`;
 
     r.checks.forEach(function (c) {
@@ -744,6 +1009,8 @@ function finishExam() {
 
 /* ============================================================
    AUSWERTUNG EINER ANTWORT
+   Bei Wiederholung wird zusätzlich geprüft, ob eine Wiederholung
+   sprachlich markiert wurde. Diese Prüfung ist bewusst tolerant.
    ============================================================ */
 
 function evaluateAnswer(answer) {
@@ -757,6 +1024,21 @@ function evaluateAnswer(answer) {
       ok: checkRule(n, rule)
     };
   });
+
+  if (answer.repeated) {
+    checks.push({
+      label: "Wiederholung angekündigt",
+      type: "funk",
+      ok: hasAny(normalize(answer.repeatText), [
+        "ich wiederhole",
+        "wiederhole",
+        "noch einmal",
+        "nochmals",
+        "ich sage es nochmals",
+        "ich sage es noch einmal"
+      ])
+    });
+  }
 
   const funkChecks = checks.filter(function (c) {
     return c.type === "funk";
@@ -779,6 +1061,9 @@ function evaluateAnswer(answer) {
   return {
     label: answer.label,
     text: answer.text,
+    firstText: answer.firstText || "",
+    repeatText: answer.repeatText || "",
+    repeated: !!answer.repeated,
     checks,
     passed: funkPassed && contentPassed
   };
@@ -790,6 +1075,11 @@ function evaluateAnswer(answer) {
    ============================================================ */
 
 function checkRule(n, rule) {
+  if (rule.concept) return hasConcept(n, rule.concept);
+  if (rule.anyConcept) return rule.anyConcept.some(function (conceptName) {
+    return hasConcept(n, conceptName);
+  });
+
   if (rule.any) return hasAny(n, rule.any);
   if (rule.start) return startsAny(n, rule.start);
   if (rule.end) return endsAny(n, rule.end);
@@ -801,6 +1091,16 @@ function checkRule(n, rule) {
   }
 
   return false;
+}
+
+function hasConcept(n, conceptName) {
+  const list = CONCEPTS[conceptName];
+
+  if (!list) return false;
+
+  return list.some(function (phrase) {
+    return n.includes(normalize(phrase));
+  });
 }
 
 
@@ -873,6 +1173,7 @@ function stopStatic() {
 function stopAllAudio() {
   clearTimeout(state.speakTimer);
   clearTimeout(state.pressTimer);
+  clearTimeout(state.saveTimer);
 
   stopStatic();
 
